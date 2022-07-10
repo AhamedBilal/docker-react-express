@@ -7,15 +7,15 @@ services:
     cap_add:
       - SYS_NICE
     volumes:
-      - "./setup.sql:/docker-entrypoint-initdb.d/setup.sql"
-    ports:
-      - "9906:3306"
+      - my-db:/var/lib/mysql
+      - "./database/setup.sql:/docker-entrypoint-initdb.d/setup.sql"
     environment:
-      MYSQL_DATABASE: books
-      MYSQL_USER: root
-      MYSQL_PASSWORD: 1234
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_HOST: localhost
+      MYSQL_DATABASE: 'books'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: '1234'
+      MYSQL_ROOT_PASSWORD: '1234'
+    ports:
+      - '3306'
 
   nginx:
     depends_on:
@@ -26,7 +26,7 @@ services:
       dockerfile: Dockerfile
       context: ./nginx
     ports:
-      - "3050:80"
+      - "80:80"
 
   backend:
     build:
@@ -39,11 +39,8 @@ services:
       - ./backend:/app
     environment:
       MYSQL_DATABASE: books
-      MYSQL_USER: root
+      MYSQL_USER: user
       MYSQL_PASSWORD: 1234
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_HOST: localhost
-      MYSQL_HOST_IP: mysql_db
 
   frontend:
     stdin_open: true
@@ -65,3 +62,6 @@ services:
       - mysql_db
     environment:
       ADMINER_DEFAULT_SERVER: mysql_db
+
+volumes:
+  my-db:

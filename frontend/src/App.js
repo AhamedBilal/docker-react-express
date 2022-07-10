@@ -3,8 +3,6 @@ import './App.css';
 import axios from 'axios';
 import { Button, Container, Card, Row } from 'react-bootstrap';
 
-axios.defaults.baseURL = 'https://localhost:3001/';
-
 function App() {
 
   const [formData, setFormData] = useState({
