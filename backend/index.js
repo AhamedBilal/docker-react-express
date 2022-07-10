@@ -10,7 +10,8 @@ app.use(express.urlencoded({extended: true}));
 const db = mysql.createPool({
     user: 'user',
     password: '1234',
-    database: 'books'
+    database: 'books',
+    host: 'mysql_db'
 });
 
 app.get('/', (req, res) => {
@@ -19,7 +20,9 @@ app.get('/', (req, res) => {
 
 app.get('/get', (req, res) => {
     const SelectQuery = " SELECT * FROM books_reviews";
+    console.log('get');
     db.query(SelectQuery, (err, result) => {
+        console.log(result, err);
         res.send(result)
     })
 })

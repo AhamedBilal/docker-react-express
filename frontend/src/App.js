@@ -48,9 +48,9 @@ function App() {
     document.location.reload();
   };
 
-  let card = fetchData.map((val, key) => {
+  let card = fetchData?.map((val, key) => {
     return (
-      <React.Fragment>
+      <React.Fragment key={key}>
         <Card style={{ width: '18rem' }} className='m-2'>
           <Card.Body>
             <Card.Title>{val.book_name}</Card.Title>
