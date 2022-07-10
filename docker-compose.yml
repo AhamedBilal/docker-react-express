@@ -1,0 +1,67 @@
+version: "3.9"
+
+services:
+  mysql_db:
+    image: mysql
+    restart: always
+    cap_add:
+      - SYS_NICE
+    volumes:
+      - "./setup.sql:/docker-entrypoint-initdb.d/setup.sql"
+    ports:
+      - "9906:3306"
+    environment:
+      MYSQL_DATABASE: books
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_HOST: localhost
+
+  nginx:
+    depends_on:
+      - backend
+      - frontend
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
+    ports:
+      - "3050:80"
+
+  backend:
+    build:
+      dockerfile: Dockerfile
+      context: "./backend"
+    depends_on:
+      - mysql_db
+    volumes:
+      - /app/node_modules
+      - ./backend:/app
+    environment:
+      MYSQL_DATABASE: books
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_HOST: localhost
+      MYSQL_HOST_IP: mysql_db
+
+  frontend:
+    stdin_open: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    build:
+      dockerfile: Dockerfile
+      context: ./frontend
+    volumes:
+      - /app/node_modules
+      - ./frontend:/app
+
+  adminer:
+    image: adminer:latest
+    restart: unless-stopped
+    ports:
+      - 8000:8080
+    depends_on:
+      - mysql_db
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql_db
